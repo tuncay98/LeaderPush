@@ -1,0 +1,93 @@
+﻿
+@{
+    ViewBag.Title = "auth";
+}
+
+@model LeaderPush.Models.DB
+@{
+    ViewBag.Title = "Index";
+}
+
+
+
+<section id="InputForm" class="InputForm">
+
+    <h2 class="Font text-center text-sm-center text-md-center text-lg-center">Welcom to Push Notification App</h2>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-sm-4 col-md-4 col-lg-4">
+                <div class="custom-col">
+                   <!-- <input type="text" value="@Session["sw"]" id="sw" hidden /> -->
+                    <center>
+
+                        @if (Session["shop"] != null)
+                        {
+                            string shopname = Session["shop"].ToString();
+                            if (Model.shopLinks.Where(w => w.Shop == shopname).FirstOrDefault().IsPremium == true)
+                            {
+                                <i style="color: gold;font-size: 150px;" class="fas fa-star"></i> <h4 class="Text">  You are the PREMIUM Client!   </h4>
+
+                            }
+
+
+                        }
+                        else if (Session["shop"] != null)
+                        {
+                            string shopname = Session["shop"].ToString();
+
+                            if (Model.shopLinks.Where(w => w.Shop == shopname).FirstOrDefault().SendLimit.Value > 0)
+                            {
+                                <i class="fas fa-bell ok"></i> <h4 class="Text"> You Have Free @Model.shopLinks.Where(w => w.Shop == shopname).FirstOrDefault().SendLimit.Value notification usages  </h4>
+
+                            }
+                        }
+                        else if (Session["shop"] != null)
+                        {
+                            string shopname = Session["shop"].ToString();
+
+                            if (Model.shopLinks.Where(w => w.Shop == shopname).FirstOrDefault().SendLimit.Value == 0)
+                            {
+                                <i class="fas fa-exclamation-triangle oks"></i> <h4 class="Text">  Buy Premium for Using the LeaderPush  </h4>
+
+                            }
+
+                        }
+
+                        else
+                        {
+                            <i class="fas fa-bell ok"></i> <h4 class="Text"> You Have Free 0 notification usages  </h4>
+
+
+                        }
+                    </center>
+                </div>
+            </div>
+            <div class="col-12 col-sm-4 col-md-4 col-lg-4">
+                <div class="custom-col">
+                    <center>
+                        @if (Session["shop"] != null && Model.users.Count() > 0)
+                        {
+                            string shopname = Session["shop"].ToString();
+
+                            <i class="fas fa-user user"></i> <h4 class="Text">  @Model.users.Where(w => w.Store == shopname).Count() Subscribers</h4>
+                        }
+                        else
+                        {
+
+                            <i class="fas fa-user user"></i> <h4 class="Text"> 0 Subscriber</h4>
+
+                        }
+                    </center>
+                </div>
+            </div>
+            <div class="col-12 col-sm-4 col-md-4 col-lg-4">
+                <div class="custom-col">
+                    <center><i class="fas fa-mobile-alt mob"></i> <h4 class="Text"> One To All</h4> </center>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
