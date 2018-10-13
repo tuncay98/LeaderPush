@@ -62,6 +62,11 @@ namespace LeaderPush.Controllers
                 if (db.ShopLinks.Where(w => w.Shop == myShopifyUrl).Count() > 0)
                 {
                     list.shopLinks = db.ShopLinks.ToList();
+                    if(db.ShopLinks.Where(w => w.Shop == myShopifyUrl).FirstOrDefault().IsPremium == true)
+                    {
+
+                        Session["premium"] = true;
+                    }
                     list.users = db.Users.ToList();
                 }
                 else {

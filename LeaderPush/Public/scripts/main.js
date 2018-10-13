@@ -57,7 +57,7 @@
 }*/
 
 
-const applicationServerPublicKey = 'BM3vjrcCcXdxElSMXduOMLa3Ce-HD0xFyKzapDHQradoFVnMqbZGb2zASqGjOJKFzxPeNMIZl3agSUb6T8sD_p8';
+const applicationServerPublicKey = 'BAS21PmINNueC0awLLy-VE6FMManBBJMZT6NUAwb3Ou0gsAuuMrYwiJGnW4f__ew1yIh1VnXVwCNTpFDig6i7eA';
 
 
 function initializeUI() {

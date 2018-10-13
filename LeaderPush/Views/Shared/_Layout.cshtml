@@ -39,7 +39,7 @@
 
     <nav class="navbar navbar-expand navbar-dark bg-dark static-top ColorChange">
 
-        <a class="navbar-brand mr-1" href="@Url.Action("Index")">Leader Push</a>
+        <a class="navbar-brand mr-1" href="@Url.Action("auth","Home")">Leader Push</a>
 
         <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
             <i class="fas fa-bars"></i>
@@ -103,7 +103,7 @@
             @if (Session["premium"] == null)
             {
                 <li class="nav-item active">
-                    <a class="nav-link" href="@Url.Action("Index","ActivePremium")">
+                    <a class="nav-link" href="@Url.Action("Index","Premium")">
                         <i class="fas fa-star"></i>
                         <span>Premium Account</span>
                     </a>

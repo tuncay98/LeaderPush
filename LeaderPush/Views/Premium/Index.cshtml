@@ -1,0 +1,35 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section id="Pro">
+    <center>
+
+        <div class="Background">
+            <i class="fas fa-star first"></i>
+            <i class="fas fa-star secend"></i>
+            <img src="~/Public/images/stars.png" />
+        </div>
+        <h1 class="PremiumText" style="color: gold;">Premuim</h1>
+
+
+    </center>
+
+    <center>
+        <ul>
+            <li>I: Unlimited Notifications</li>
+            <li>II: Sending a Big Image </li>
+            <li>III: SMS Notificatoins</li>
+            <li>IV: Mobile Vibration</li>
+
+        </ul>
+    </center>
+
+    <center>
+        <button class="btn-buy"><a href="@Url.Action("Index","Purchase")" target="_blank">Buy 7$/Month</a></button>
+
+    </center>
+
+</section>
