@@ -101,6 +101,21 @@ namespace LeaderPush.Controllers
             return View(list);
         }
 
+        public async System.Threading.Tasks.Task<ActionResult> SMS() {
+
+            string code = Request.QueryString["code"];
+            string myShopifyUrl = Request.QueryString["shop"];
+
+            string accessToken = await AuthorizationService.Authorize(code, myShopifyUrl, API, Secret);
+
+            var service = new CustomerService(myShopifyUrl, accessToken);
+            IEnumerable<Customer> customers = await service.ListAsync();
+
+            List<Customer> listOfCus = customers.Where(w=>w.Phone != null).ToList();
+
+            return View(listOfCus);
+        }
+
 
     }
 }

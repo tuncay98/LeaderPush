@@ -36,6 +36,8 @@ self.addEventListener('push', function (event) {
     console.log('Notification Recieved:');
     console.log(data);
 
+    var array = JSON.parse("[" + data.Vib + "]")
+
     link = data.link;
     const title = data.title;
     const options = {
@@ -43,7 +45,7 @@ self.addEventListener('push', function (event) {
         image: data.bigimage,
         icon: data.image,
         badge: 'images/badge.png',
-        vibrate: data.Vib
+        vibrate: array
     };
 
     event.waitUntil(self.registration.showNotification(title, options));
