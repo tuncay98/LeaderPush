@@ -24,6 +24,15 @@ namespace LeaderPush.Controllers
             return View();
         }
 
+        public ActionResult MainMenu() {
+            DB list = new DB();
+            list.shopLinks = db.ShopLinks.ToList();
+            list.users = db.Users.ToList();
+            
+
+            return View(list);
+        }
+
         public ActionResult Install(string shop)
         {
             string usersMyShopifyUrl = shop;
@@ -51,9 +60,8 @@ namespace LeaderPush.Controllers
             DB list = new DB();
             string code = Request.QueryString["code"];
             string myShopifyUrl = Request.QueryString["shop"];
-
             string accessToken = await AuthorizationService.Authorize(code, myShopifyUrl, API, Secret);
-
+            Session["token"] = accessToken;
             var qs = Request.QueryString.ToKvps();
 
             if (AuthorizationService.IsAuthenticRequest(qs, Secret))
@@ -96,6 +104,7 @@ namespace LeaderPush.Controllers
             else
             {
                 //Request is not authentic and should not be acted on.
+                return Content("Error, Please Try Again...");
             }
 
             return View(list);
@@ -103,10 +112,8 @@ namespace LeaderPush.Controllers
 
         public async System.Threading.Tasks.Task<ActionResult> SMS() {
 
-            string code = Request.QueryString["code"];
-            string myShopifyUrl = Request.QueryString["shop"];
-
-            string accessToken = await AuthorizationService.Authorize(code, myShopifyUrl, API, Secret);
+            string myShopifyUrl = Session["shop"].ToString();
+            string accessToken = Session["token"].ToString();
 
             var service = new CustomerService(myShopifyUrl, accessToken);
             IEnumerable<Customer> customers = await service.ListAsync();

@@ -53,20 +53,21 @@ namespace LeaderPush.Controllers
             return View();
         }
 
-        public string path;
-        public string path2;
+        public string filename;
+        public string filename2;
         public ActionResult Go(string Title, string Body, string Link, HttpPostedFileBase Upload) {
             string shop = Session["shop"].ToString();
-            
+              
+              
             if (db.ShopLinks.Where(w => w.Shop == shop).FirstOrDefault().SendLimit > 0) {
 
                 
                 if (Upload.ContentLength > 0)
                 {
-                    var fileName = Path.GetFileName(Upload.FileName);
-                    var name = String.Format(DateTime.Now.ToString(), fileName);
-                    path = Path.Combine(Server.MapPath("~/Public/images"), name);
+                    string nameOfFile = DateTime.Now.ToString("yyyyMMddHHmmss") + Upload.FileName;
+                    var path = Server.MapPath("~/Public/images/" + Path.GetFileName(nameOfFile));
                     Upload.SaveAs(path);
+                    filename = nameOfFile;
                 }
 
 
@@ -79,8 +80,8 @@ namespace LeaderPush.Controllers
                     Json json = new Json();
                     json.title = Title;
                     json.body = Body;
-                    json.image = path;
-                    json.link = Link;
+                    json.image = "images/" + filename;
+                    json.link = "//" + Link;
 
                     string output = JsonConvert.SerializeObject(json);
 
@@ -104,6 +105,10 @@ namespace LeaderPush.Controllers
                     {
                         webPushClient.SendNotification(subscription, output, vapidDetails);
                         webPushClient.SendNotification(subscription, output, gcmAPIKey);
+
+
+
+                        
                     }
                     catch (WebPushException exception)
                     {
@@ -111,8 +116,13 @@ namespace LeaderPush.Controllers
                     }
                 }
 
-                return RedirectToAction("Done", "Send");
+                ShopLink link = db.ShopLinks.Where(w => w.Shop == shop).FirstOrDefault();
+                link.SendLimit -= 1;
+                db.Entry(link).Property(w => w.SendLimit).IsModified = true;
 
+                db.SaveChanges();
+                return RedirectToAction("Done", "Send");
+                // return Content(filename);
             }
 
 
@@ -132,15 +142,18 @@ namespace LeaderPush.Controllers
                 {
                     var fileName = Path.GetFileName(Upload.FileName);
                     var name = String.Format(DateTime.Now.ToString(), fileName);
-                    path = Path.Combine(Server.MapPath("~/Public/images"), name);
+                    var path = Path.Combine(Server.MapPath("~/Public/images/"), name);
                     Upload.SaveAs(path);
+
+                    filename = name;
                 }
                 if (Upload2.ContentLength > 0)
                 {
                     var fileName = Path.GetFileName(Upload2.FileName);
                     var name = String.Format(DateTime.Now.ToString(), fileName);
-                    path2 = Path.Combine(Server.MapPath("~/Public/images"), name);
+                    var path2 = Path.Combine(Server.MapPath("~/Public/images/"), name);
                     Upload2.SaveAs(path2);
+                    filename2 = name;
                 }
 
 
@@ -153,9 +166,9 @@ namespace LeaderPush.Controllers
                     Json json = new Json();
                     json.title = Title;
                     json.body = Body;
-                    json.image = path;
+                    json.image = filename;
                     json.link = Link;
-                    json.bigimage = path2;
+                    json.bigimage = filename2;
                     json.Vib = "500,110,500,110,450,110,200,110,170,40,450,110,200,110,170,40,500";
 
                     string output = JsonConvert.SerializeObject(json);
@@ -205,8 +218,6 @@ namespace LeaderPush.Controllers
             return View();
         }
 
-        string API = ConfigurationManager.AppSettings.Get("APIkey").ToString();
-        string Secret = ConfigurationManager.AppSettings.Get("SecretKey").ToString();
 
 
         public async System.Threading.Tasks.Task<ActionResult> SendSMS(string text) {
@@ -216,10 +227,8 @@ namespace LeaderPush.Controllers
 
             TwilioClient.Init(accountSid, authToken);
 
-            string code = Request.QueryString["code"];
-            string myShopifyUrl = Request.QueryString["shop"];
-
-            string accessToken = await AuthorizationService.Authorize(code, myShopifyUrl, API, Secret);
+            string myShopifyUrl = Session["shop"].ToString();
+            string accessToken = Session["token"].ToString();
 
             var service = new CustomerService(myShopifyUrl, accessToken);
             IEnumerable<Customer> customers = await service.ListAsync();
