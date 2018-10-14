@@ -471,6 +471,8 @@
     <Content Include="Public\vendor\fontawesome-free\webfonts\fa-solid-900.woff2" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <Content Include="Views\Home\MainMenu.cshtml" />
+    <Content Include="Views\Premium\Done.cshtml" />
+    <Content Include="Views\Premium\Failed.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

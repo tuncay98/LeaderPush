@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="PushDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="PushDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Admins">
           <Key>
             <PropertyRef Name="Id" />
@@ -24,6 +24,7 @@
           <Property Name="UninstallDate" Type="datetime" />
           <Property Name="IsPremium" Type="bit" />
           <Property Name="SendLimit" Type="int" />
+          <Property Name="PremiumID" Type="bigint" />
         </EntityType>
         <EntityType Name="Users">
           <Key>
@@ -40,46 +41,46 @@
           <EntitySet Name="ShopLinks" EntityType="Self.ShopLinks" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="PushDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="PushDBEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Admins" EntityType="PushDBModel.Admin" />
+          <EntitySet Name="ShopLinks" EntityType="PushDBModel.ShopLink" />
+          <EntitySet Name="Users" EntityType="PushDBModel.User" />
+        </EntityContainer>
         <EntityType Name="Admin">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Username" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Password" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Username" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Password" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="ShopLink">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Shop" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Shop" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="Token" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="InstallDate" Type="DateTime" Precision="3" />
           <Property Name="UninstallDate" Type="DateTime" Precision="3" />
           <Property Name="IsPremium" Type="Boolean" />
           <Property Name="SendLimit" Type="Int32" />
+          <Property Name="PremiumID" Type="Int64" />
         </EntityType>
         <EntityType Name="User">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="PushEndpoint" Type="String" MaxLength="800" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="P256dh" Type="String" MaxLength="800" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Auth" Type="String" MaxLength="800" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Store" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PushEndpoint" Type="String" Nullable="false" MaxLength="800" FixedLength="false" Unicode="true" />
+          <Property Name="P256dh" Type="String" Nullable="false" MaxLength="800" FixedLength="false" Unicode="true" />
+          <Property Name="Auth" Type="String" Nullable="false" MaxLength="800" FixedLength="false" Unicode="true" />
+          <Property Name="Store" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
         </EntityType>
-        <EntityContainer Name="PushDBEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="Admins" EntityType="Self.Admin" />
-          <EntitySet Name="ShopLinks" EntityType="Self.ShopLink" />
-          <EntitySet Name="Users" EntityType="Self.User" />
-        </EntityContainer>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -89,33 +90,34 @@
           <EntitySetMapping Name="Admins">
             <EntityTypeMapping TypeName="PushDBModel.Admin">
               <MappingFragment StoreEntitySet="Admins">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Username" ColumnName="Username" />
                 <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="Username" ColumnName="Username" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="ShopLinks">
             <EntityTypeMapping TypeName="PushDBModel.ShopLink">
               <MappingFragment StoreEntitySet="ShopLinks">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Shop" ColumnName="Shop" />
-                <ScalarProperty Name="Token" ColumnName="Token" />
-                <ScalarProperty Name="InstallDate" ColumnName="InstallDate" />
-                <ScalarProperty Name="UninstallDate" ColumnName="UninstallDate" />
-                <ScalarProperty Name="IsPremium" ColumnName="IsPremium" />
+                <ScalarProperty Name="PremiumID" ColumnName="PremiumID" />
                 <ScalarProperty Name="SendLimit" ColumnName="SendLimit" />
+                <ScalarProperty Name="IsPremium" ColumnName="IsPremium" />
+                <ScalarProperty Name="UninstallDate" ColumnName="UninstallDate" />
+                <ScalarProperty Name="InstallDate" ColumnName="InstallDate" />
+                <ScalarProperty Name="Token" ColumnName="Token" />
+                <ScalarProperty Name="Shop" ColumnName="Shop" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Users">
             <EntityTypeMapping TypeName="PushDBModel.User">
               <MappingFragment StoreEntitySet="Users">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="PushEndpoint" ColumnName="PushEndpoint" />
-                <ScalarProperty Name="P256dh" ColumnName="P256dh" />
-                <ScalarProperty Name="Auth" ColumnName="Auth" />
                 <ScalarProperty Name="Store" ColumnName="Store" />
+                <ScalarProperty Name="Auth" ColumnName="Auth" />
+                <ScalarProperty Name="P256dh" ColumnName="P256dh" />
+                <ScalarProperty Name="PushEndpoint" ColumnName="PushEndpoint" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

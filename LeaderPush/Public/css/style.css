@@ -58,12 +58,15 @@
     display: inline-block;
     box-sizing: border-box;
 }
+.leftside {
+    float: left;
+    margin-top: 10px;
+}
 .Preview {
     background-color: white;
     width: 333px;
     height: 320px;
     float: right;
-
 }
 
 .MainPlace {
@@ -120,9 +123,9 @@ h2, h3 {
     background-color: #4a83e9a8;
     color: white;
     border: none;
+    transition: all 1s ease;
     cursor: pointer;
 }
-
 
 h4 {
     color: #696969;
@@ -137,9 +140,18 @@ h4 {
     background-color: #4a83e9a8;
     color: white;
     border: none;
+    transition: all 1s ease;
     cursor: pointer;
-
 }
+    #Button:hover {
+        background-color: #4a83e9;
+    }
+
+    .Button:hover {
+        background-color: #4a83e9;
+    }
+
+
 .ColorChange {
     background-color: #4a83e9 !important;
 }
@@ -162,7 +174,7 @@ h4 {
     border-radius: 8px;
     border: 1px solid gray;
     cursor: pointer;
-    padding: 7px 40px;
+    padding: 7px 31px;
 }
 
 

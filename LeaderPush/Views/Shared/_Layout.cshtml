@@ -73,46 +73,47 @@
                     <i class="fas fa-home"></i>
                     <span>Main Menu</span>
                 </a>
-            </li>
-            @if (Session["premium"] == null)
+            </li>  <!-- Burdan-->
+            @if (Session["shop"] != null)
             {
+                if (Session["premium"] != null)
+                {
+
+                    <li class="nav-item active">
+                        <a class="nav-link" href="@Url.Action("Premium", "Send")">
+                            <i class="fas fa-share-square"></i>
+                            <span>Push a Notification</span>
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item active">
+                        <a class="nav-link" href="@Url.Action("Index", "Send")">
+                            <i class="fas fa-share-square"></i>
+                            <span>Push a Notification</span>
+                        </a>
+                    </li>
+
+                }
                 <li class="nav-item active">
-                    <a class="nav-link" href="@Url.Action("Index", "Send")">
-                        <i class="fas fa-share-square"></i>
-                        <span>Push a Notification</span>
-                    </a>
-                </li>
-            }
-            else
-            {
-                <li class="nav-item active">
-                    <a class="nav-link" href="@Url.Action("Premium", "Send")">
-                        <i class="fas fa-share-square"></i>
-                        <span>Push a Notification</span>
+                    <a class="nav-link" href="@Url.Action("SMS","Home")">
+                        <i class="fas fa-comment-alt"></i>
+                        <span> SMS Notifications</span>
                     </a>
                 </li>
 
+                if (Session["premium"] == null)
+                {
+                    <li class="nav-item active">
+                        <a class="nav-link" href="@Url.Action("Index","Premium")">
+                            <i class="fas fa-star"></i>
+                            <span>Premium Account</span>
+                        </a>
+                    </li>
+                }
             }
-            <li class="nav-item active">
-                <a class="nav-link" href="@Url.Action("SMS","Home")">
-                    <i class="fas fa-comment-alt"></i>
-                    <span> SMS Notifications</span>
-                </a>
-            </li>
 
-            @if (Session["premium"] == null)
-            {
-                <li class="nav-item active">
-                    <a class="nav-link" href="@Url.Action("Index","Premium")">
-                        <i class="fas fa-star"></i>
-                        <span>Premium Account</span>
-                    </a>
-                </li>
-            }
-            else
-            {
-
-            }
             <li class="nav-item active">
                 <a class="nav-link" href="@Url.Action("Index","support")">
                     <i class="fas fa-question-circle"></i>

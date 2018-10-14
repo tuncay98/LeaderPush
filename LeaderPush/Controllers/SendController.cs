@@ -140,20 +140,19 @@ namespace LeaderPush.Controllers
 
                 if (Upload.ContentLength > 0)
                 {
-                    var fileName = Path.GetFileName(Upload.FileName);
-                    var name = String.Format(DateTime.Now.ToString(), fileName);
-                    var path = Path.Combine(Server.MapPath("~/Public/images/"), name);
+                    string nameOfFile = DateTime.Now.ToString("yyyyMMddHHmmss") + Upload.FileName;
+                    var path = Server.MapPath("~/Public/images/" + Path.GetFileName(nameOfFile));
                     Upload.SaveAs(path);
 
-                    filename = name;
+                    filename = nameOfFile;
                 }
                 if (Upload2.ContentLength > 0)
                 {
-                    var fileName = Path.GetFileName(Upload2.FileName);
-                    var name = String.Format(DateTime.Now.ToString(), fileName);
-                    var path2 = Path.Combine(Server.MapPath("~/Public/images/"), name);
-                    Upload2.SaveAs(path2);
-                    filename2 = name;
+                    string nameOfFile2 = DateTime.Now.ToString("yyyyMMddHHmmss") + Upload2.FileName;
+                    var path = Server.MapPath("~/Public/images/" + Path.GetFileName(nameOfFile2));
+                    Upload2.SaveAs(path);
+
+                    filename2 = nameOfFile2;
                 }
 
 
@@ -166,9 +165,9 @@ namespace LeaderPush.Controllers
                     Json json = new Json();
                     json.title = Title;
                     json.body = Body;
-                    json.image = filename;
-                    json.link = Link;
-                    json.bigimage = filename2;
+                    json.image = "images/" + filename; ;
+                    json.link = "//" + Link;
+                    json.bigimage = "images/" + filename2;
                     json.Vib = "500,110,500,110,450,110,200,110,170,40,450,110,200,110,170,40,500";
 
                     string output = JsonConvert.SerializeObject(json);

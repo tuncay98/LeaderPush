@@ -21,5 +21,6 @@ namespace LeaderPush.Models
         public Nullable<System.DateTime> UninstallDate { get; set; }
         public Nullable<bool> IsPremium { get; set; }
         public Nullable<int> SendLimit { get; set; }
+        public Nullable<long> PremiumID { get; set; }
     }
 }
