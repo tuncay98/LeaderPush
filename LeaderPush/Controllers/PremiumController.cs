@@ -27,7 +27,7 @@ namespace LeaderPush.Controllers
             {
                 Name = "Premium Account",
                 Price = 7,
-                Test = true, //Marks this charge as a test, meaning it won't charge the shop owner.
+                //Test = true, //Marks this charge as a test, meaning it won't charge the shop owner.
                 ReturnUrl = "https://www.leaderpush.com/Premium/Confirm"
             };
 

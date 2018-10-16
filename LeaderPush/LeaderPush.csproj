@@ -473,6 +473,7 @@
     <Content Include="Views\Home\MainMenu.cshtml" />
     <Content Include="Views\Premium\Done.cshtml" />
     <Content Include="Views\Premium\Failed.cshtml" />
+    <Content Include="Views\Send\NoNum.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

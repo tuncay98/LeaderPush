@@ -235,24 +235,25 @@ namespace LeaderPush.Controllers
             List<Customer> listOfCus = customers.Where(w => w.Phone != null).ToList();
 
 
-            foreach (var item in listOfCus)
-            {
-
-             var message = MessageResource.Create(
-             body: text,
-             from: new Twilio.Types.PhoneNumber("+18506608313"),
-             to: new Twilio.Types.PhoneNumber(item.Phone)
-             );
-
-               
-
+            if (listOfCus.Count > 0) {
+                foreach (var item in listOfCus)
+                {
+                    var message = MessageResource.Create(
+                    body: text,
+                    from: new Twilio.Types.PhoneNumber("+18506608313"),
+                    to: new Twilio.Types.PhoneNumber(item.Phone)
+                    );
+                }
+                return RedirectToAction("Done", "Send");
             }
-            
 
 
-            return RedirectToAction("Done", "Send");
+            return RedirectToAction("NoNum", "Send");
         }
 
+        public ActionResult NoNum() {
+            return View();
+        }
 
 
     }
