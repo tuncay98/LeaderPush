@@ -56,176 +56,205 @@
   });
 }*/
 
+var Inc;
 
-const applicationServerPublicKey = 'BAS21PmINNueC0awLLy-VE6FMManBBJMZT6NUAwb3Ou0gsAuuMrYwiJGnW4f__ew1yIh1VnXVwCNTpFDig6i7eA';
+function isIncognito(callback) {
+    var fs = window.RequestFileSystem || window.webkitRequestFileSystem;
 
-
-function initializeUI() {
-    //  pushButton.addEventListener('click', function () {
-    // pushButton.disabled = true;
-    if (isSubscribed) {
-        // TODO: Unsubscribe user
+    if (!fs) {
+        callback(false);
     } else {
-        subscribeUser();
+        fs(window.TEMPORARY,
+            100,
+            callback.bind(undefined, false),
+            callback.bind(undefined, true)
+        );
     }
-    //});
+}
 
-    // Set the initial subscription value
-    swRegistration.pushManager.getSubscription()
-        .then(function (subscription) {
-            isSubscribed = !(subscription === null);
+isIncognito(function (itIs) {
+    if (itIs) {
+        console.log("Please, do not use the incognito mode for a push notification")
+    } else {
 
-            updateSubscriptionOnServer(subscription);
+        const applicationServerPublicKey = 'BAS21PmINNueC0awLLy-VE6FMManBBJMZT6NUAwb3Ou0gsAuuMrYwiJGnW4f__ew1yIh1VnXVwCNTpFDig6i7eA';
 
+
+        function initializeUI() {
+            //  pushButton.addEventListener('click', function () {
+            // pushButton.disabled = true;
             if (isSubscribed) {
-                console.log('User IS subscribed.');
+                // TODO: Unsubscribe user
             } else {
-                console.log('User is NOT subscribed.');
+                subscribeUser();
+            }
+            //});
+
+            // Set the initial subscription value
+            swRegistration.pushManager.getSubscription()
+                .then(function (subscription) {
+                    isSubscribed = !(subscription === null);
+
+                    updateSubscriptionOnServer(subscription);
+
+                    if (isSubscribed) {
+                        console.log('User IS subscribed.');
+                    } else {
+                        console.log('User is NOT subscribed.');
+                    }
+
+                    updateBtn();
+                });
+        }
+
+
+
+        function updateBtn() {
+
+            if (Notification.permission === 'denied') {
+                // pushButton.textContent = 'Push Messaging Blocked.';
+                //  pushButton.disabled = true;
+                updateSubscriptionOnServer(null);
+                return;
             }
 
-            updateBtn();
-        });
-}
+            if (isSubscribed) {
+                //   pushButton.textContent = 'Disable Push Messaging';
+            } else {
+                // pushButton.textContent = 'Enable Push Messaging';
+            }
+
+            // pushButton.disabled = false;
+        }
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        var foo = getParameterByName('url');
+        var dom = document.domain;
+
+        var link = "https://" + dom + "/apps/leaderpush/public/sw.js";
+
+        navigator.serviceWorker.register(link)
+            .then(function (swReg) {
+                console.log('Service Worker is registered', swReg);
+
+                swRegistration = swReg;
+                initializeUI();
+            })
+
+
+        function subscribeUser() {
+            const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
+            swRegistration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: applicationServerKey
+            })
+                .then(function (subscription) {
+                    console.log('User is subscribed.');
+
+                    updateSubscriptionOnServer(subscription);
+
+                    isSubscribed = true;
+
+                    updateBtn();
+                })
+                .catch(function (err) {
+                    console.log('Failed to subscribe the user: ', err);
+                    updateBtn();
+                });
+        }
+
+        function createCORSRequest(method, url) {
+            var xhr = new XMLHttpRequest();
+            if ("withCredentials" in xhr) {
+                // XHR has 'withCredentials' property only if it supports CORS
+                xhr.open(method, url, true);
+            } else if (typeof XDomainRequest != "undefined") { // if IE use XDR
+                xhr = new XDomainRequest();
+                xhr.open(method, url);
+            } else {
+                xhr = null;
+            }
+            return xhr;
+        }
+
+        function updateSubscriptionOnServer(subscription) {
+            // TODO: Send subscription to application server
+
+            // const subscriptionJson = document.querySelector('.js-subscription-json');
+            // const subscriptionDetails =
+            //    document.querySelector('.js-subscription-details');
+
+            if (subscription) {
+                // subscriptionJson.textContent = JSON.stringify(subscription);
+
+                var t = JSON.stringify(subscription);
+                var obj = JSON.parse(t);
+                var endpoint = obj.endpoint;
+                var p256dh = obj.keys.p256dh;
+                var auth = obj.keys.auth;
 
 
 
-function updateBtn() {
+                var domain = document.domain;
 
-    if (Notification.permission === 'denied') {
-       // pushButton.textContent = 'Push Messaging Blocked.';
-      //  pushButton.disabled = true;
-        updateSubscriptionOnServer(null);
-        return;
-    }
-
-    if (isSubscribed) {
-     //   pushButton.textContent = 'Disable Push Messaging';
-    } else {
-       // pushButton.textContent = 'Enable Push Messaging';
-    }
-
-   // pushButton.disabled = false;
-}
-function getParameterByName(name, url) {
-    if (!url) url = window.location.href;
-    name = name.replace(/[\[\]]/g, '\\$&');
-    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-        results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, ' '));
-}
-
-var foo = getParameterByName('url');
-var dom = document.domain;
-
-var link = "https://" + dom + "/apps/leaderpush/public/sw.js";
-
-navigator.serviceWorker.register(link)
-    .then(function (swReg) {
-        console.log('Service Worker is registered', swReg);
-
-        swRegistration = swReg;
-        initializeUI();
-    })
-
-
-function subscribeUser() {
-    const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
-    swRegistration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: applicationServerKey
-    })
-        .then(function (subscription) {
-            console.log('User is subscribed.');
-
-            updateSubscriptionOnServer(subscription);
-
-            isSubscribed = true;
-
-            updateBtn();
-        })
-        .catch(function (err) {
-            console.log('Failed to subscribe the user: ', err);
-            updateBtn();
-        });
-}
-
-function createCORSRequest(method, url) {
-    var xhr = new XMLHttpRequest();
-    if ("withCredentials" in xhr) {
-        // XHR has 'withCredentials' property only if it supports CORS
-        xhr.open(method, url, true);
-    } else if (typeof XDomainRequest != "undefined") { // if IE use XDR
-        xhr = new XDomainRequest();
-        xhr.open(method, url);
-    } else {
-        xhr = null;
-    }
-    return xhr;
-}
-
-function updateSubscriptionOnServer(subscription) {
-    // TODO: Send subscription to application server
-
-   // const subscriptionJson = document.querySelector('.js-subscription-json');
-   // const subscriptionDetails =
-    //    document.querySelector('.js-subscription-details');
-
-    if (subscription) {
-       // subscriptionJson.textContent = JSON.stringify(subscription);
-
-        var t = JSON.stringify(subscription);
-        var obj = JSON.parse(t);
-        var endpoint = obj.endpoint;
-        var p256dh = obj.keys.p256dh;
-        var auth = obj.keys.auth;
+                var request = createCORSRequest("get", '//www.leaderpush.com/Send/Getjson?endpoint=' + endpoint + '&p256dh=' + p256dh + '&auth=' + auth + '&domain=' + domain);
+                if (request) {
+                    // Define a callback function
+                    request.onload = function () { };
+                    // Send request
+                    request.send();
+                }
 
 
 
-        var domain = document.domain;
 
-        var request = createCORSRequest("get", '//www.leaderpush.com/Send/Getjson?endpoint=' + endpoint + '&p256dh=' + p256dh + '&auth=' + auth + '&domain=' + domain);
-        if (request) {
-            // Define a callback function
-            request.onload = function () { };
-            // Send request
-            request.send();
+                //subscriptionDetails.classList.remove('is-invisible');
+            } else {
+                // subscriptionDetails.classList.add('is-invisible');
+            }
+        }
+
+
+
+        //const pushButton = document.querySelector('.js-push-btn');
+
+        let isSubscribed = false;
+        let swRegistration = null;
+
+
+
+
+        function urlB64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding)
+                .replace(/\-/g, '+')
+                .replace(/_/g, '/');
+
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
         }
 
 
 
 
-        //subscriptionDetails.classList.remove('is-invisible');
-    } else {
-       // subscriptionDetails.classList.add('is-invisible');
+
     }
-}
+});
 
 
-
-//const pushButton = document.querySelector('.js-push-btn');
-
-let isSubscribed = false;
-let swRegistration = null;
-
-
-
-
-function urlB64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding)
-        .replace(/\-/g, '+')
-        .replace(/_/g, '/');
-
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-
-    for (let i = 0; i < rawData.length; ++i) {
-        outputArray[i] = rawData.charCodeAt(i);
-    }
-    return outputArray;
-}
 
 
 

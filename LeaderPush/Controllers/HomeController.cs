@@ -42,7 +42,6 @@ namespace LeaderPush.Controllers
 
             var scopes = new List<AuthorizationScope>(){
                 AuthorizationScope.ReadCustomers,
-                AuthorizationScope.WriteCustomers,
                 AuthorizationScope.WriteScriptTags
             };
 
@@ -60,67 +59,96 @@ namespace LeaderPush.Controllers
             DB list = new DB();
             string code = Request.QueryString["code"];
             string myShopifyUrl = Request.QueryString["shop"];
-            string accessToken = await AuthorizationService.Authorize(code, myShopifyUrl, API, Secret);
-            Session["token"] = accessToken;
-            var qs = Request.QueryString.ToKvps();
-
-            if (AuthorizationService.IsAuthenticRequest(qs, Secret))
+            /*TRY-Catch*/
+            try
             {
-                Session["shop"] = myShopifyUrl;
-                if (db.ShopLinks.Where(w => w.Shop == myShopifyUrl).Count() > 0)
+                string accessToken = await AuthorizationService.Authorize(code, myShopifyUrl, API, Secret);
+                Session["token"] = accessToken;
+                var qs = Request.QueryString.ToKvps();
+
+                if (AuthorizationService.IsAuthenticRequest(qs, Secret))
                 {
-                    list.shopLinks = db.ShopLinks.ToList();
-                    if(db.ShopLinks.Where(w => w.Shop == myShopifyUrl).FirstOrDefault().IsPremium == true)
+                    Session["shop"] = myShopifyUrl;
+                    if (db.ShopLinks.Where(w => w.Shop == myShopifyUrl).Count() > 0)
                     {
+                        list.shopLinks = db.ShopLinks.ToList();
+                        if (db.ShopLinks.Where(w => w.Shop == myShopifyUrl).FirstOrDefault().IsPremium == true)
+                        {
 
-                        Session["premium"] = true;
+                            Session["premium"] = true;
+                        }
+                        list.users = db.Users.ToList();
                     }
-                    list.users = db.Users.ToList();
-                }
-                else {
-                    ShopLink NewShop = new ShopLink();
-                    NewShop.Shop = myShopifyUrl;
-                    NewShop.Token = accessToken;
-                    NewShop.InstallDate = DateTime.Now;
-                    NewShop.IsPremium = false;
-                    NewShop.SendLimit = 500;
-
-                    db.ShopLinks.Add(NewShop);
-                    db.SaveChanges();
-
-                    list.shopLinks = db.ShopLinks.ToList();
-                    list.users = db.Users.ToList();
-
-                    var service = new ScriptTagService(myShopifyUrl, accessToken);
-                    var tag = new ScriptTag()
+                    else
                     {
-                        Event = "onload",
-                        Src = "https://www.leaderpush.com/public/scripts/main.js",
-                    };
+                        ShopLink NewShop = new ShopLink();
+                        NewShop.Shop = myShopifyUrl;
+                        NewShop.Token = accessToken;
+                        NewShop.InstallDate = DateTime.Now;
+                        NewShop.IsPremium = false;
+                        NewShop.SendLimit = 500;
 
-                    tag = await service.CreateAsync(tag);
+                        db.ShopLinks.Add(NewShop);
+                        db.SaveChanges();
+
+                        list.shopLinks = db.ShopLinks.ToList();
+                        list.users = db.Users.ToList();
+
+                        var service = new ScriptTagService(myShopifyUrl, accessToken);
+                        var tag = new ScriptTag()
+                        {
+                            Event = "onload",
+                            Src = "https://www.leaderpush.com/public/scripts/main.js",
+                        };
+
+                        tag = await service.CreateAsync(tag);
+                    }
                 }
-            }
-            else
-            {
-                //Request is not authentic and should not be acted on.
-                return Content("Error, Please Try Again...");
-            }
+                else
+                {
+                    //Request is not authentic and should not be acted on.
+                    return Content("Error, Please Try Again...");
+                }
 
-            return View(list);
+                return View(list);
+            }
+            catch
+            {
+                return RedirectToAction("UrlBreak", "Home");
+                
+            }
+            
+
         }
 
         public async System.Threading.Tasks.Task<ActionResult> SMS() {
 
             string myShopifyUrl = Session["shop"].ToString();
-            string accessToken = Session["token"].ToString();
+            string accessToken = db.ShopLinks.Where(w => w.Shop == myShopifyUrl).FirstOrDefault().Token;
+            /*Session["token"].ToString();*/
 
-            var service = new CustomerService(myShopifyUrl, accessToken);
-            IEnumerable<Customer> customers = await service.ListAsync();
+            try
+            {
+                var service = new CustomerService(myShopifyUrl, accessToken);
+                IEnumerable<Customer> customers = await service.ListAsync();
 
-            List<Customer> listOfCus = customers.Where(w=>w.Phone != null).ToList();
+                List<Customer> listOfCus = customers.Where(w => w.Phone != null).ToList();
 
-            return View(listOfCus);
+                return View(listOfCus);
+            }
+            catch
+            {
+
+                return RedirectToAction("UrlBreak", "Home");
+
+            }
+
+
+        }
+
+        public ActionResult UrlBreak() {
+
+            return View();
         }
 
 

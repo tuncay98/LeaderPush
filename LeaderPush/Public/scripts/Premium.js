@@ -12,6 +12,7 @@ TitleText = false;
 BodyText = false;
 LinkText = false;
 UploadFile = false;
+UploadFile2 = false;
 
 
 Title.addEventListener("input", function () {
@@ -116,15 +117,25 @@ Upload2.addEventListener("change", function () {
 
     readURL2(this);
 
+    if (this.files.length > 0) {
+
+        UploadFile2 = true;
+        Check()
+    } else {
+        UploadFile2 = false;
+        Button.disabled = true;
+    }
+
 
 
 });
 
 function Check() {
-    if (TitleText && BodyText && LinkText && UploadFile) {
+    if (TitleText && BodyText && LinkText && UploadFile && UploadFile2) {
         Button.disabled = false;
     }
 }
+
 
 
 function readURL(input) {

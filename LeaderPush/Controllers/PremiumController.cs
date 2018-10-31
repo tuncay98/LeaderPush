@@ -20,25 +20,35 @@ namespace LeaderPush.Controllers
         public async System.Threading.Tasks.Task<ActionResult> Buy() {
 
             string myShopifyUrl = Session["shop"].ToString();
-            string accessToken = Session["token"].ToString();
+            string accessToken = db.ShopLinks.Where(w => w.Shop == myShopifyUrl).FirstOrDefault().Token;
 
-            var service = new RecurringChargeService(myShopifyUrl, accessToken);
-            var charge = new RecurringCharge()
+           
+            try
             {
-                Name = "Premium Account",
-                Price = 7,
-                //Test = true, //Marks this charge as a test, meaning it won't charge the shop owner.
-                ReturnUrl = "https://www.leaderpush.com/Premium/Confirm"
-            };
+                var service = new RecurringChargeService(myShopifyUrl, accessToken);
+                var charge = new RecurringCharge()
+                {
+                    Name = "Premium Account",
+                    Price = 7,
+                   /* Test= true,*/
+                    //Test = true, //Marks this charge as a test, meaning it won't charge the shop owner.
+                    ReturnUrl = "https://www.leaderpush.com/Premium/Confirm"
+                };
 
-            charge = await service.CreateAsync(charge);
+                charge = await service.CreateAsync(charge);
 
-            ShopLink link = db.ShopLinks.Where(w => w.Shop == myShopifyUrl).FirstOrDefault();
-            link.PremiumID = charge.Id;
-            db.Entry(link).Property(w => w.PremiumID).IsModified = true;
-            db.SaveChanges();
+                ShopLink link = db.ShopLinks.Where(w => w.Shop == myShopifyUrl).FirstOrDefault();
+                link.PremiumID = charge.Id;
+                db.Entry(link).Property(w => w.PremiumID).IsModified = true;
+                db.SaveChanges();
 
-            return Redirect(charge.ConfirmationUrl);
+                return Redirect(charge.ConfirmationUrl);
+            }
+            catch
+            {
+
+                return RedirectToAction("UrlBreak", "Home");
+            }
         }
 
         public async System.Threading.Tasks.Task<ActionResult> Confirm(long charge_id) {
@@ -46,26 +56,37 @@ namespace LeaderPush.Controllers
             string myShopifyUrl = db.ShopLinks.Where(w => w.PremiumID == charge_id).FirstOrDefault().Shop;
             string accessToken = db.ShopLinks.Where(w => w.PremiumID == charge_id).FirstOrDefault().Token;
 
-            var service = new RecurringChargeService(myShopifyUrl, accessToken);
 
-            var charge = await service.GetAsync(charge_id);
 
-            if (charge.Status == "accepted")
+            try
+            {
+                var service = new RecurringChargeService(myShopifyUrl, accessToken);
+
+                var charge = await service.GetAsync(charge_id);
+
+                if (charge.Status == "accepted")
+                {
+
+                    await service.ActivateAsync(charge_id);
+
+                    ShopLink link = db.ShopLinks.Where(w => w.Shop == myShopifyUrl).FirstOrDefault();
+                    link.IsPremium = true;
+                    db.Entry(link).Property(w => w.IsPremium).IsModified = true;
+                    db.SaveChanges();
+                }
+                else if (charge.Status == "declined")
+                {
+
+                    return RedirectToAction("Failed", "Premium");
+                }
+
+                return RedirectToAction("Install", "Home", new { shop = myShopifyUrl});
+            }
+            catch
             {
 
-                await service.ActivateAsync(charge_id);
-
-                ShopLink link = db.ShopLinks.Where(w => w.Shop == myShopifyUrl).FirstOrDefault();
-                link.IsPremium = true;
-                db.Entry(link).Property(w => w.IsPremium).IsModified = true;
-                db.SaveChanges();
+                return RedirectToAction("UrlBreak", "Home");
             }
-            else if (charge.Status == "declined") {
-
-                return RedirectToAction("Failed", "Premium");
-            }
-
-            return RedirectToAction("Done", "Premium");
         }
 
         public ActionResult Done() {

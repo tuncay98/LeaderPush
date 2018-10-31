@@ -26,7 +26,7 @@
                             string shopname = Session["shop"].ToString();
                             if (Model.shopLinks.Where(w => w.Shop == shopname).FirstOrDefault().IsPremium == true)
                             {
-                                <i style="color: gold;font-size: 150px;" class="fas fa-star"></i> <h4 class="Text">  You are the PREMIUM Client!   </h4>
+                                <i style="color: gold;font-size: 150px;" class="fas fa-star"></i> <h4 class="Text">  You are Premuim!   </h4>
 
                             }
                             else if (Model.shopLinks.Where(w => w.Shop == shopname).FirstOrDefault().SendLimit.Value > 0)
@@ -36,7 +36,7 @@
                             }
                             else
                             {
-                                <i class="fas fa-exclamation-triangle oks"></i> <h4 class="Text">  Buy Premium for Using the LeaderPush  </h4>
+                                <i class="fas fa-exclamation-triangle oks"></i> <h4 class="Text">  Buy Premium account for using full features of the LeaderPush  </h4>
 
                             }        
                         }       

@@ -216,8 +216,11 @@ namespace LeaderPush.Controllers
 
             return View();
         }
+        public ActionResult NumFailed() {
+            return View();
+        }
 
-
+      
 
         public async System.Threading.Tasks.Task<ActionResult> SendSMS(string text) {
 
@@ -227,28 +230,47 @@ namespace LeaderPush.Controllers
             TwilioClient.Init(accountSid, authToken);
 
             string myShopifyUrl = Session["shop"].ToString();
-            string accessToken = Session["token"].ToString();
-
-            var service = new CustomerService(myShopifyUrl, accessToken);
-            IEnumerable<Customer> customers = await service.ListAsync();
-
-            List<Customer> listOfCus = customers.Where(w => w.Phone != null).ToList();
+            string accessToken = db.ShopLinks.Where(w => w.Shop == myShopifyUrl).FirstOrDefault().Token;
 
 
-            if (listOfCus.Count > 0) {
-                foreach (var item in listOfCus)
+
+            try
+            {
+                var service = new CustomerService(myShopifyUrl, accessToken);
+                IEnumerable<Customer> customers = await service.ListAsync();
+
+                List<Customer> listOfCus = customers.Where(w => w.Phone != null).ToList();
+
+                if (listOfCus.Count > 0)
                 {
-                    var message = MessageResource.Create(
-                    body: text,
-                    from: new Twilio.Types.PhoneNumber("+18506608313"),
-                    to: new Twilio.Types.PhoneNumber(item.Phone)
-                    );
+                    foreach (var item in listOfCus)
+                    {
+                        try
+                        {
+                            var message = MessageResource.Create(
+                           body: text,
+                           from: new Twilio.Types.PhoneNumber("+18506608313"),
+                           to: new Twilio.Types.PhoneNumber("+994773005533")
+                           );
+                        }
+                        catch
+                        {
+                            return RedirectToAction("NumFailed", "Send");
+                        }
+                    }
+                    return RedirectToAction("Done", "Send");
                 }
-                return RedirectToAction("Done", "Send");
+
+
+                return RedirectToAction("NoNum", "Send");
+            }
+            catch
+            {
+
+                return RedirectToAction("UrlBreak", "Home");
             }
 
-
-            return RedirectToAction("NoNum", "Send");
+          
         }
 
         public ActionResult NoNum() {
